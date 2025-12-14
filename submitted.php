@@ -1,18 +1,17 @@
-<?php
+/*<?php
+/*
 $returnData = array();
 
 if (isset($_POST["city"])) {
 
-    include("db.php");
+    include("db-conn.php");
 
     $returnData["id"] = $_POST["city"];
 
     $statement = $pdo->prepare("SELECT * FROM places WHERE city_id = :id");
-    $statement->execute([
-        "id" => $_POST["city"]
-    ]);
-
+    $statement->execute(["id" => $_POST["city"]]);
     $places = $statement->fetchAll();
+
     $returnData["places"] = $places;
 
 } else {
@@ -20,3 +19,5 @@ if (isset($_POST["city"])) {
 }
 
 echo json_encode($returnData);
+*/
+?>

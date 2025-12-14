@@ -1,9 +1,10 @@
+
 <?php
 include("db-conn.php");
 
-
+/* Make sure state was sent */
 if (!isset($_POST["state"])) {
-    header("Location: index.php");
+    echo "Invalid state";
     exit;
 }
 

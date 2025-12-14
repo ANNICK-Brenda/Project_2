@@ -6,28 +6,48 @@ body {
     color: #fff;
 }
 
+/* Main container (card look like teacher demo) */
+.container {
+    background-color: #111;
+    padding: 30px;
+    margin: 40px auto;
+    width: 70%;
+}
+
+/* Forms */
 form {
     display: flex;
     flex-direction: column;
-    width: 50%;
-    margin: 0 auto;
 }
 
+/* Labels */
 label {
-    margin-top: 10px;
+    margin-top: 15px;
+    font-weight: bold;
 }
 
+/* Inputs & dropdowns */
 input,
 select {
-    margin-top: 5px;
-    padding: 5px;
+    margin-top: 8px;
+    padding: 10px;
+    font-size: 16px;
 }
 
+/* Submit buttons */
 input[type="submit"] {
-    margin-top: 10px;
-    padding: 10px;
+    margin-top: 20px;
+    padding: 12px;
     background-color: #000;
     color: #fff;
     border: none;
     cursor: pointer;
+}
+
+/* Links */
+a {
+    color: #fff;
+    text-decoration: underline;
+    margin-top: 15px;
+    display: inline-block;
 }

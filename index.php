@@ -1,52 +1,57 @@
 <?php
-require_once "db-conn.php";
+include "db-conn.php";
 
-/* Get all states from database */
-$sql = "SELECT id, name FROM states";
-$statement = $pdo->prepare($sql);
+$statement = $pdo->prepare("SELECT * FROM states");
 $statement->execute();
 $states = $statement->fetchAll();
+
+/* Get today's date for date validation */
+$today = date("Y-m-d");
 ?>
 
 <?php include "./templates/header.php"; ?>
 
-<h1>Bookings.com</h1>
+<h1>Booking</h1>
 
-<form action="result.php" method="post">
+<form action="results.php" method="post">
 
-    <label for="state">State:</label>
-    <select name="state" id="state" required>
+    <label for="state">State</label>
+    <select name="state" id="state">
         <?php
         foreach ($states as $state) {
-            echo "<option value='" . $state['id'] . "'>" . $state['name'] . "</option>";
+            echo "<option value='".$state["id"]."'>".$state["name"]."</option>";
         }
         ?>
     </select>
 
-    <br><br>
+    <label for="check_in">Check In Date</label>
+    <input 
+        type="date" 
+        name="check_in" 
+        id="check_in"
+        min="<?php echo $today; ?>"
+        required
+    >
 
-    <label for="date">Date:</label>
-    <input type="date" name="date" id="date" required>
+    <label for="check_out">Check Out Date</label>
+    <input 
+        type="date" 
+        name="check_out" 
+        id="check_out"
+        required
+    >
 
-    <br><br>
-
-    <label for="time">Time:</label>
-    <input type="time" name="time" id="time">
-
-    <br><br>
-
-    <label for="rooms">Number of rooms:</label>
-    <input type="number" name="rooms" id="rooms" min="1" value="1">
-
-    <br><br>
-
-    <label for="guests">Number of guests:</label>
-    <input type="number" name="guests" id="guests" min="1" value="1">
-
-    <br><br>
-
-    <button type="submit">Search</button>
+    <input type="submit" value="Search">
 
 </form>
+
+<script>
+const checkIn = document.getElementById("check_in");
+const checkOut = document.getElementById("check_out");
+
+checkIn.addEventListener("change", () => {
+    checkOut.min = checkIn.value;
+});
+</script>
 
 <?php include "./templates/footer.php"; ?>
