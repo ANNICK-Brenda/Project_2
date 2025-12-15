@@ -1,10 +1,9 @@
-
 <?php
 include("db-conn.php");
 
-/* Make sure state was sent */
+/* If state is missing, go back home */
 if (!isset($_POST["state"])) {
-    echo "Invalid state";
+    header("Location: index.php");
     exit;
 }
 
@@ -23,8 +22,8 @@ $statement->execute([
 $cities = $statement->fetchAll();
 
 /* Get values from previous page */
-$check_in  = $_POST["check_in"];
-$check_out = $_POST["check_out"];
+$check_in  = $_POST["check_in"]  ?? "";
+$check_out = $_POST["check_out"] ?? "";
 
 /* Get search values (defaults) */
 $city_id       = $_POST["city"] ?? null;
@@ -38,7 +37,7 @@ include("./templates/header.php");
 
 <h2>Results for <?php echo $state["name"]; ?></h2>
 
-<!-- Back button -->
+<!-- Change state or dates -->
 <form action="index.php" method="get">
     <input type="submit" value="<< Change State or Dates">
 </form>

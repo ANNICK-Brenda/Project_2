@@ -1,120 +1,60 @@
 <?php
 include("db-conn.php");
 
-
-if (!isset($_POST["state"])) {
+/* Make sure a place was selected */
+if (!isset($_POST["place_id"])) {
     header("Location: index.php");
     exit;
 }
 
-/* Get state */
-$statement = $pdo->prepare("SELECT * FROM states WHERE id = :id");
-$statement->execute([
-    "id" => $_POST["state"]
-]);
-$state = $statement->fetch();
-
-/* Get cities for this state */
-$statement = $pdo->prepare("SELECT * FROM cities WHERE state_id = :id");
-$statement->execute([
-    "id" => $_POST["state"]
-]);
-$cities = $statement->fetchAll();
-
-/* Get values from previous page */
-$check_in  = $_POST["check_in"];
+$place_id = $_POST["place_id"];
+$check_in = $_POST["check_in"];
 $check_out = $_POST["check_out"];
 
-/* Get search values (defaults) */
-$city_id       = $_POST["city"] ?? null;
-$number_rooms  = $_POST["number_rooms"] ?? 1;
-$number_guests = $_POST["number_guests"] ?? 1;
+/* Get place info */
+$statement = $pdo->prepare("SELECT * FROM places WHERE id = :id");
+$statement->execute([
+    "id" => $place_id
+]);
+$place = $statement->fetch();
+
+/* Get owner info */
+$statement = $pdo->prepare("SELECT * FROM users WHERE id = :id");
+$statement->execute([
+    "id" => $place["user_id"]
+]);
+$user = $statement->fetch();
+
+/* Calculate nights */
+$start = new DateTime($check_in);
+$end = new DateTime($check_out);
+$nights = $start->diff($end)->days;
 
 include("./templates/header.php");
 ?>
 
 <div class="container">
 
-<h2>Results for <?php echo $state["name"]; ?></h2>
+<h2>Your Booking Details</h2>
 
-<!-- Back button -->
+<p>Check In Date: <?php echo $check_in; ?></p>
+<p>Check Out Date: <?php echo $check_out; ?></p>
+<p>Nights: <?php echo $nights; ?></p>
+
+<p>
+Owner:
+<?php echo $user["first_name"] . " " . $user["last_name"]; ?>
+</p>
+
+<!-- Back to home -->
 <form action="index.php" method="get">
-    <input type="submit" value="<< Change State or Dates">
+    <input type="submit" value="Back to Home">
 </form>
 
-<!-- Search form -->
-<form action="results.php" method="post">
-
-    <input type="hidden" name="state" value="<?php echo $_POST["state"]; ?>">
-    <input type="hidden" name="check_in" value="<?php echo $check_in; ?>">
-    <input type="hidden" name="check_out" value="<?php echo $check_out; ?>">
-
-    <label for="city">City</label>
-    <select name="city" id="city">
-        <?php
-        foreach ($cities as $city) {
-            $selected = ($city_id == $city["id"]) ? "selected" : "";
-            echo "<option value='".$city["id"]."' $selected>".$city["name"]."</option>";
-        }
-        ?>
-    </select>
-
-    <label for="number_rooms">Number of rooms</label>
-    <input
-        type="number"
-        name="number_rooms"
-        id="number_rooms"
-        value="<?php echo $number_rooms; ?>"
-        min="1"
-    >
-
-    <label for="number_guests">Number of guests</label>
-    <input
-        type="number"
-        name="number_guests"
-        id="number_guests"
-        value="<?php echo $number_guests; ?>"
-        min="1"
-    >
-
-    <input type="submit" value="Search">
+<!-- Confirm booking -->
+<form action="confirm.php" method="post">
+    <input type="submit" value="Confirm">
 </form>
-
-<?php
-/* Show listings only after search */
-if ($city_id !== null) {
-
-    $statement = $pdo->prepare(
-        "SELECT * FROM places
-         WHERE city_id = :city
-         AND number_rooms >= :rooms"
-    );
-
-    $statement->execute([
-        "city"  => $city_id,
-        "rooms" => $number_rooms
-    ]);
-
-    $places = $statement->fetchAll();
-
-    if (count($places) == 0) {
-        echo "<p>no results</p>";
-    } else {
-        foreach ($places as $place) {
-            ?>
-            <p><?php echo $place["name"]; ?></p>
-
-            <form action="book.php" method="post">
-                <input type="hidden" name="place_id" value="<?php echo $place["id"]; ?>">
-                <input type="hidden" name="check_in" value="<?php echo $check_in; ?>">
-                <input type="hidden" name="check_out" value="<?php echo $check_out; ?>">
-                <input type="submit" value="Book">
-            </form>
-            <?php
-        }
-    }
-}
-?>
 
 </div>
 
